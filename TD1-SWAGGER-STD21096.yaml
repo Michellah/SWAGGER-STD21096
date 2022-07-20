@@ -1,16 +1,15 @@
 openapi: 3.0.1
 info:
   title: STD21096 API
-  description: 'Global description of my API'
-  version: 1.0.0
+  description: Global description of my API
+  version: 1.0.0-oas3
 servers:
- - url: https://STD21096.com
-tags: 
- - name: Students
-   
- - name: Courses
+  - url: https://STD21096.com
+tags:
+  - name: Students
+  - name: Courses
 paths:
- /students:
+  /students:
     get:
       tags:
         - Students
@@ -18,21 +17,21 @@ paths:
       summary: Get all students
       description: Get all students with details
       responses:
-        200: 
+        '200':
           description: List of students
           content:
             application/json:
               schema:
                 type: array
-                items: 
+                items:
                   $ref: '#/components/schemas/Student'
-        400:
+        '400':
           description: Bad request
-    post: 
+    post:
       tags:
         - Students
       operationId: createStudent
-      summary : Create new student
+      summary: Create new student
       description: Create new student
       requestBody:
         description: Student to be created
@@ -42,21 +41,130 @@ paths:
               $ref: '#/components/schemas/CreateStudent'
         required: true
       responses:
-        200:
+        '200':
           description: List of students
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Student'
-        400:
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
                 type: array
-                items: 
+                items:
                   $ref: '#/components/schemas/BadRequest'
- /courses:
+  /students/{id}:
+    get:
+      tags:
+        - Students id
+      operationId: getStudentsId
+      summary: Get students id
+      description: Get student id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+    put:
+      tags:
+        - Students
+      operationId: Get modificate student
+      summary: Get modificate student
+      description: Get modificate student
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+    patch:
+      tags:
+        - Students
+      operationId: pathModification
+      summary: Partial modification
+      description: Partial modification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+    delete:
+      tags:
+        - Students
+      operationId: deleteStudentId
+      summary: Delete student id
+      description: Delete student id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: success
+        '404':
+          description: No authorisation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Authorisation'  
+  /courses:
     get:
       tags:
         - Courses
@@ -64,23 +172,23 @@ paths:
       summary: Get all list of courses
       description: Get all courses with details
       responses:
-        200: 
+        '200':
           description: List of courses
           content:
             application/json:
               schema:
                 type: array
-                items: 
+                items:
                   $ref: '#/components/schemas/Courses'
-        400:
+        '400':
           description: Bad request
           content:
             application/json:
-                schema:
-                  type: array
-                  items: 
-                    $ref: '#/components/schemas/BadRequest'
-    post: 
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+    post:
       tags:
         - Courses
       operationId: createCourses
@@ -91,7 +199,7 @@ paths:
           schema:
             type: integer
             format: int64
-      summary : Create new courses
+      summary: Create new courses
       description: Create new courses
       requestBody:
         description: Courses to be created
@@ -101,21 +209,21 @@ paths:
               $ref: '#/components/schemas/CreateCourses'
         required: true
       responses:
-        200:
+        '200':
           description: List of courses
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CreateCourses'
-        400:
-          description: Bad request
+        '400':
+          description: Authorisation
           content:
             application/json:
-                schema:
-                  type: array
-                  items: 
-                    $ref: '#/components/schemas/BadRequest'
- /courses/{id}:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+  /courses/{id}:
     get:
       tags:
         - Courses
@@ -130,21 +238,21 @@ paths:
             type: integer
             format: int64
       responses:
-        200: 
+        '200':
           description: Courses
           content:
             application/json:
               schema:
                 type: array
-                items: 
+                items:
                   $ref: '#/components/schemas/Courses'
-        400:
+        '400':
           description: Bad request
           content:
             application/json:
               schema:
                 type: array
-                items: 
+                items:
                   $ref: '#/components/schemas/BadRequest'
 components:
   schemas:
@@ -153,11 +261,11 @@ components:
       properties:
         name:
           type: string
-          example: "Rakoto"
+          example: Rakoto
         birth_date:
           type: string
           format: date
-          example: "2022-01-01"
+          example: '2022-01-01'
     Student:
       allOf:
         - $ref: '#/components/schemas/CreateStudent'
@@ -170,9 +278,9 @@ components:
       type: object
       properties:
         page:
-         type: integer
-         example: 2
-        page_size: 
+          type: integer
+          example: 2
+        page_size:
           type: integer
           example: 12
     CreateCourses:
@@ -188,6 +296,10 @@ components:
           type: string
           format: date
     BadRequest:
-      example: {
-          code: 400 "Bad request"
-      }      
+      example:
+        code: 400 "Bad request"
+    Authorisation:
+      type: object
+      properties:
+        code:
+          example: 404 "no authorisation"
