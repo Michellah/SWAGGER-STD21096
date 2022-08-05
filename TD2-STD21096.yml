@@ -1,31 +1,15 @@
+
 openapi: 3.0.1
 info:
   title: STD21096-TD2
-  description: TD2
-  termsOfService: http://swagger.io/terms/
-  contact:
-    email: apiteam@swagger.io
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
-externalDocs:
-  description: Find out more about Swagger
-  url: http://swagger.io
 servers:
-# Added by API Auto Mocking Plugin
-- description: SwaggerHub API Auto Mocking
-  url: https://STD21096.com
-tags:
-- name: Room
-- name: Films
-- name: Projections
-- name: Categories
+- url: https://STD21096.io
 paths:
-  /room:
+  /rooms:
     get:
       tags:
-        - "Room"
+        - "Rooms"
       summary: Get all Rooms
       operationId: getRooms
       responses:
@@ -40,77 +24,10 @@ paths:
         400:
           description: Error
           content: {}
-    post:
-      tags:
-        - "Room"
-      summary: Create a new room
-      operationId: createRooms
-      responses:
-        200: 
-          description: Success
-          content:
-            application/json:
-              schema: 
-                type: array
-                items:
-                  $ref: '#/components/schemas/NewRoom'
-        404:
-          description: Bad request
-          content: {}
-    delete:
-      tags:
-        - "Room"
-      summary: deletes room by referring to its id
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: string
-          required: true
-      responses:
-        200:
-          description: Success
-          content:
-            text/plain:
-              schema:
-                type: string
-                example: "Returns the id of the deleted rooms"
-        400:
-          description: Error
-          content: {}
-    patch:
-      tags:
-        - "Room"
-      summary: Update in rooms
-      operationId: updateRooms  
-      description: | 
-        Possible changes on capacity of rooms
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/NewRoom'
-            examples:
-              changeFilm:
-                summary: Change capacity of rooms
-                value:
-                - id: C
-                  capacity: 50
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/NewRoom'      
-  /room/{id}:
+  /rooms/{id}:
     get:
       tags:
-        - "Room"
+        - "Rooms"
       summary: get the room by specified id
       operationId: getRoom
       parameters:
@@ -132,6 +49,13 @@ paths:
         - "Films"
       summary: Get all Films
       operationId: getFilms
+      description: If `category` exists then return a list of films filtered by category
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            example: "Action"
       responses:
         200:
           description: Success
@@ -155,7 +79,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/NewFilm'
+                $ref: '#/components/schemas/Film'
       responses:
         200:
           description: Success
@@ -168,20 +92,49 @@ paths:
         400:
           description: Error
           content: {}
-    post: 
+    post:
       tags:
         - "Films"
-      summary: create a new film
-      operationId: createFilm
+      summary: Creates some films
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/NewFilm'
       responses:
         200:
-          description: Success
+          description: List of new films
           content:
             application/json:
               schema:
                 type: array
-                items: 
-                  $ref: '#/components/schemas/NewFilm'
+                items:
+                  $ref: '#/components/schemas/Film'
+    delete:
+      tags:
+        - "Films"
+      summary: Delete some films
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Returns the id of the deleted student"
+
         400:
           description: Error
           content: {}
@@ -251,7 +204,6 @@ paths:
               schema:
                 type: string
                 example: "Returns the id of the deleted student"
-
         400:
           description: Error
           content: {}
@@ -261,6 +213,17 @@ paths:
         - "Projections"
       summary: Get all projections
       operationId: getProjections
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
       responses:
         200:
           description: Success
@@ -316,6 +279,7 @@ paths:
           description: Error
           content: {}
     patch:
+      summary: modify partialy 
       tags:
         - "Projections"
       description: | 
@@ -345,11 +309,6 @@ paths:
                   roomId: B
                 - id: 2
                   roomId: B
-              changeHour:
-                summary: Change hour
-                value:
-                - id: 1
-                  projectionId: 5
       responses:
         200:
           description: OK
@@ -430,28 +389,29 @@ paths:
         400:
           description: Error
           content: {}
-  /Categories:
+  /categories:
     get:
       tags:
         - "Categories"
-      summary: Get all Categories of movies
-      description: Get all category of movies
+      summary: Get all category
+      operationId: getCategories
       responses:
         200:
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Category'
-        400: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Category'
+        400:
           description: Error
           content: {}
-    post:
+    put:
       tags:
         - "Categories"
-      summary: creates a new category
+      summary: modifies entirely a Categories list
       requestBody:
-        required: true
         description: new category
         content:
           application/json:
@@ -461,16 +421,127 @@ paths:
         200:
           description: Success
           content:
+            text/plain:
+              schema:
+                type: string
+                example: "Returns modified"
+        400:
+          description: Error
+          content: {}
+    post:
+      tags:
+        - "Categories"
+      summary: creates a new category
+      requestBody:
+        required: true
+        description: new film
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCategory'
+      responses:
+        200:
+          description: Success
+          content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Projection'
+                $ref: '#/components/schemas/Category'
+        400:
+          description: Error
+          content: {}
+    patch:
+      summary: modify partialy 
+      tags:
+        - "Categories"
+      description: | 
+        Possible changes on:
+        * name: change category
+        * film: change film
+        * id: change categoryId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
+            examples:
+              changeName:
+                summary: Change some category
+                value:
+                - name: "string"
+                  filmId: 1
+                - name: "string"
+                  filmId: 2
+              changeId:
+                summary: Change id
+                value:
+                - id: 1
+                  title: "string"
+                - id: 2
+                  title: "string"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+  /categories/{id}:
+    get:
+      tags:
+        - "Categories"
+      summary: get the category by specified id
+      operationId: getCategory
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        400:
+          description: Error
+          content: {}
+    put:
+      tags:
+        - "Categories"
+      summary: allows you to modify category data except its id
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        required: true
+        description: new category
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCategory'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
         400:
           description: Error
           content: {}
     delete:
       tags:
         - "Categories"
-      summary: deletes a projection by referring to its id
+      summary: deletes a category by referring to its id
       parameters:
         - name: id
           in: path
@@ -484,93 +555,32 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: "Returns the id of the deleted projection"
+                example: "Returns the id of the deleted category"
+
         400:
           description: Error
-          content: {}      
-  /categories/{id}:
+          content: {}
+  /Calendar:
     get:
-      tags:
-        - "Categories"
-      summary: Get the category by specified name
-      description: Get the category by specified name
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: integer
-          required: true
+      tags:  
+        - " calendar"  
+      operationId: getCalendar
+      summary: Get weekly calendar
+      description: Get weekly calendar with details
       responses:
         200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Category'
-        400: 
-          description: Error
-          content: {} 
-    patch:
-      tags:
-        - "Categories"
-      description: | 
-        Possible changes on:
-        * film: add
-        * film: change
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/NewCategory'
-            examples:
-              changeFilm:
-                summary: Change some films
-                value:
-                - id: 1
-                  filmId: 1
-              addFilm:
-                summary: Add film
-                value:
-                - idFilm: 10
-                  name: Mission impossible      
-      responses:
-        200:
-          description: OK
+          description: List of calendar
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/NewCategory' 
-                  
+                  $ref: "#/components/schemas/Calendar"
+        400:
+          description: Error
+          content: {}          
 components:
   schemas:
-    Category:
-      type: object
-      properties:
-        idCategory: 
-          type: integer
-          example: 1
-        name: 
-          type: string
-          example: Drama
-    NewCategory:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Action
-        film: 
-          type: object
-          properties:
-            idFilm: 
-              type: integer
-              example: 10
-            name:
-              type: string
-              example: no time to die
     Room:
       type: object
       properties:
@@ -580,15 +590,7 @@ components:
         capacity:
           type: number
           example: 30
-    NewRoom:
-      type: object
-      properties:
-        id:
-          type: string
-          example: 'C'
-        capacity:
-          type: number
-          example: 50
+        
     NewFilm:
       type: object
       properties:
@@ -600,7 +602,7 @@ components:
           type: string
         director:
           type: string
-        date:
+        released_date:
           type: string
           format: date
     Film:
@@ -626,14 +628,72 @@ components:
           type: string
           format: date-time
     Projection:
-      allOf:
-        - $ref: '#/components/schemas/Film'
-        - $ref: '#/components/schemas/Room'
       type: object
       properties:
-        hour:
-          type: string
-          format: date-time
         id:
           type: number
           example: '1'
+        hour:
+          type: string
+          format: date-time
+        film:
+          $ref: '#/components/schemas/Film'
+        room:
+          $ref: '#/components/schemas/Room'
+    NewCategory:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Action"
+    Category:
+      type: object
+      properties:
+        id:
+          type: number
+          example: '1'
+      allOf:
+        - $ref: '#/components/schemas/NewCategory'
+    Calendar:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        timetable:
+          type: object
+          properties:
+            monday:
+              type: object
+              properties:
+                08:00 AM:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Projection"              
+                03:00 PM:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Projection"
+            tuesday:
+              type: object
+              properties:
+                08:00 AM:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Projection"              
+                03:00 AM:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Projection"
+            wednesday:
+              type: object
+              properties:
+                08:00 AM:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Projection"              
+                03:00 AM:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/Projection"                
